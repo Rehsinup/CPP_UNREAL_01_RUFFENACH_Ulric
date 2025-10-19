@@ -7,12 +7,12 @@
 #include "ExerciceComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class COURSCPP_API UExerciceComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UExerciceComponent();
 
@@ -26,27 +26,23 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 private :
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true"))
+	float TargetScale;
 
-	
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scale", meta = (AllowPrivateAccess = "true"))
-  float TargetScale;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Scale", meta = (AllowPrivateAccess = "true"))
+	float ScaleSpeed;
 
-  UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Scale", meta = (AllowPrivateAccess = "true"))
-  float ScaleSpeed;
-
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	FVector BaseScale;
 
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	bool bIsOscillating;
-	
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
-	bool bScale;
 
-
+	float OscillationTime;
+	bool bIncreasing;
+	AActor* Owner;
 };

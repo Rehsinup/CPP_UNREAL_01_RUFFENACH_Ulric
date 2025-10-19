@@ -15,7 +15,7 @@ UExerciceComponent::UExerciceComponent()
 	ScaleSpeed = 1.0f;
 
 	bIsOscillating = false;
-	bScale = true;
+	Owner = GetOwner();
 	// ...
 }
 
@@ -25,9 +25,9 @@ void UExerciceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	// ...
-	if (AActor* Owner = GetOwner())
+	if (Owner != nullptr)
 	{
-		FVector BaseScale = Owner->GetActorScale3D();
+		BaseScale = Owner->GetActorScale3D();
 	}
 }
 
@@ -37,30 +37,26 @@ void UExerciceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FVector CurrentScale = Owner->GetActorScale3D();
-	FVector TargetScaleVector = bScale ? BaseScale * TargetScale : BaseScale;
+	if (!bIsOscillating)
+		return;
 
-	if (bScale)
+
+	OscillationTime += bIncreasing ? DeltaTime * ScaleSpeed : -DeltaTime * ScaleSpeed;
+
+	if (OscillationTime >= 1.0f)
 	{
-		CurrentScale.X += ScaleSpeed * DeltaTime;
-		CurrentScale.Y += ScaleSpeed * DeltaTime;
-		CurrentScale.Z += ScaleSpeed * DeltaTime;
-
-		if (CurrentScale.X >= TargetScaleVector.X)
-			bScale = false;
+		OscillationTime = 1.0f;
+		bIncreasing = false;
+	}
+	else if (OscillationTime <= 0.0f)
+	{
+		OscillationTime = 0.0f;
+		bIncreasing = true;
 	}
 
-	else
-	{
-		CurrentScale.X -= ScaleSpeed * DeltaTime;
-		CurrentScale.Y -= ScaleSpeed * DeltaTime;
-		CurrentScale.Z -= ScaleSpeed * DeltaTime;
+	FVector NewScale = FMath::Lerp(BaseScale, BaseScale * TargetScale, OscillationTime);
 
-		if (CurrentScale.X <= TargetScaleVector.X)
-			bScale = true;
-	}
-
-	Owner->SetActorScale3D(CurrentScale);
+	Owner->SetActorScale3D(NewScale);
 }
 
 void UExerciceComponent::StartOscillation()
@@ -72,8 +68,6 @@ void UExerciceComponent::StopOscillation()
 {
 	bIsOscillating = false;
 
-	if (AActor* Owner = GetOwner())
-	{
 		Owner->SetActorScale3D(BaseScale);
-	}
+
 }
